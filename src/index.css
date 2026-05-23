@@ -1,0 +1,129 @@
+/* Minimal baseline styles. Not aiming for visual fidelity — the architecture is the point. */
+
+:root {
+  --color-bg: #fafaf8;
+  --color-fg: #1a1a1a;
+  --color-muted: #6b6b6b;
+  --color-accent: #1f4068;
+  --color-accent-fg: #ffffff;
+  --color-card: #ffffff;
+  --color-border: #e5e5e3;
+  --max-width: 1100px;
+  --radius: 6px;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--color-bg); color: var(--color-fg); }
+img { max-width: 100%; height: auto; display: block; }
+button { font: inherit; cursor: pointer; }
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-card);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header h1 { margin: 0; font-size: 1.25rem; letter-spacing: -0.01em; }
+
+.app-header button {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+.app-header button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.error {
+  max-width: var(--max-width);
+  margin: 1rem auto;
+  padding: 1rem;
+  background: #fee;
+  border: 1px solid #fbb;
+  border-radius: var(--radius);
+  color: #800;
+}
+
+.empty {
+  max-width: var(--max-width);
+  margin: 4rem auto;
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.site { background: var(--color-bg); }
+
+/* Hero */
+.block-hero {
+  position: relative;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+}
+.block-hero img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.6);
+  z-index: 0;
+}
+.block-hero .hero-content { position: relative; z-index: 1; padding: 2rem; max-width: var(--max-width); }
+.block-hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+.block-hero p { font-size: clamp(1rem, 2vw, 1.25rem); margin: 0 0 1.5rem; opacity: 0.95; }
+.block-hero .cta {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+  border: none;
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Featured listings */
+.block-featured { padding: 4rem 2rem; max-width: var(--max-width); margin: 0 auto; }
+.block-featured h2 { font-size: 2rem; margin: 0 0 2rem; letter-spacing: -0.02em; }
+.listings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.listing-card { background: var(--color-card); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden; }
+.listing-card img { aspect-ratio: 4/3; object-fit: cover; }
+.listing-card .body { padding: 1rem; }
+.listing-card .price { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
+.listing-card .address { color: var(--color-muted); margin: 0 0 0.75rem; font-size: 0.9rem; }
+.listing-card .stats { color: var(--color-fg); font-size: 0.9rem; }
+
+/* Agent bio */
+.block-bio { padding: 4rem 2rem; max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 200px 1fr; gap: 2rem; align-items: start; }
+.block-bio img { width: 200px; height: 200px; object-fit: cover; border-radius: 50%; }
+.block-bio h2 { margin: 0 0 0.5rem; font-size: 1.75rem; }
+.block-bio .credentials { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.block-bio .credentials span { background: var(--color-card); border: 1px solid var(--color-border); padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
+@media (max-width: 600px) { .block-bio { grid-template-columns: 1fr; text-align: center; } .block-bio img { margin: 0 auto; } }
+
+/* Testimonials */
+.block-testimonials { padding: 4rem 2rem; background: var(--color-card); }
+.block-testimonials .inner { max-width: var(--max-width); margin: 0 auto; }
+.block-testimonials h2 { font-size: 2rem; margin: 0 0 2rem; letter-spacing: -0.02em; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.testimonial { padding: 1.5rem; border-left: 3px solid var(--color-accent); }
+.testimonial blockquote { margin: 0 0 0.75rem; font-size: 1.05rem; font-style: italic; }
+.testimonial cite { color: var(--color-muted); font-style: normal; }
+
+/* Contact */
+.block-contact { padding: 4rem 2rem; max-width: var(--max-width); margin: 0 auto; }
+.block-contact h2 { font-size: 2rem; margin: 0 0 1.5rem; letter-spacing: -0.02em; }
+.block-contact form { display: grid; gap: 1rem; max-width: 500px; }
+.block-contact label { display: block; font-size: 0.9rem; color: var(--color-muted); margin-bottom: 0.25rem; }
+.block-contact input, .block-contact textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius); font: inherit; }
+.block-contact button { background: var(--color-accent); color: var(--color-accent-fg); border: none; padding: 0.8rem; border-radius: var(--radius); font-weight: 500; }
