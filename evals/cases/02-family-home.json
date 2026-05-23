@@ -1,0 +1,25 @@
+{
+  "agent": {
+    "name": "David Okafor",
+    "brokerage": "Hometown Realty Group",
+    "yearsExperience": 8,
+    "city": "Naperville",
+    "email": "david@example.com",
+    "phone": "(630) 555-0188",
+    "bio": "Helping growing families find their forever home in Chicago's western suburbs since 2017. Father of three."
+  },
+  "listings": [
+    {
+      "price": "$725,000",
+      "address": "452 Maple Grove Ln, Naperville, IL 60540",
+      "beds": 4,
+      "baths": 3,
+      "sqft": 2680,
+      "description": "Updated colonial on a quiet cul-de-sac. Finished basement, fenced backyard, walking distance to award-winning District 203 schools.",
+      "features": ["Finished basement", "3-car garage", "Fenced yard", "Updated kitchen", "Walk to schools"],
+      "neighborhood": "Hobson West",
+      "imageUrl": "https://picsum.photos/seed/family1/1200/800"
+    }
+  ],
+  "preferences": { "tone": "warm" }
+}

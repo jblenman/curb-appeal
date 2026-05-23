@@ -1,0 +1,190 @@
+{
+  "timestamp": "2026-05-23T19:27:33.880Z",
+  "results": [
+    {
+      "file": "01-condo.json",
+      "latencyMs": 8972,
+      "blockTypes": [
+        "hero",
+        "featured-listings",
+        "agent-bio",
+        "testimonials",
+        "contact"
+      ],
+      "checks": [
+        {
+          "name": "required-blocks",
+          "passed": true
+        },
+        {
+          "name": "no-empty-content",
+          "passed": true
+        },
+        {
+          "name": "agent-name-in-bio",
+          "passed": true
+        },
+        {
+          "name": "listing-facts-mentioned",
+          "passed": true
+        },
+        {
+          "name": "word-counts",
+          "passed": true
+        },
+        {
+          "name": "schema-shapes",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "file": "02-family-home.json",
+      "latencyMs": 8596,
+      "blockTypes": [
+        "hero",
+        "agent-bio",
+        "featured-listings",
+        "testimonials",
+        "contact"
+      ],
+      "checks": [
+        {
+          "name": "required-blocks",
+          "passed": true
+        },
+        {
+          "name": "no-empty-content",
+          "passed": true
+        },
+        {
+          "name": "agent-name-in-bio",
+          "passed": true
+        },
+        {
+          "name": "listing-facts-mentioned",
+          "passed": true
+        },
+        {
+          "name": "word-counts",
+          "passed": true
+        },
+        {
+          "name": "schema-shapes",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "file": "03-new-construction.json",
+      "latencyMs": 8851,
+      "blockTypes": [
+        "hero",
+        "featured-listings",
+        "agent-bio",
+        "testimonials",
+        "contact"
+      ],
+      "checks": [
+        {
+          "name": "required-blocks",
+          "passed": true
+        },
+        {
+          "name": "no-empty-content",
+          "passed": true
+        },
+        {
+          "name": "agent-name-in-bio",
+          "passed": true
+        },
+        {
+          "name": "listing-facts-mentioned",
+          "passed": true
+        },
+        {
+          "name": "word-counts",
+          "passed": true
+        },
+        {
+          "name": "schema-shapes",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "file": "04-multi-listing.json",
+      "latencyMs": 10001,
+      "blockTypes": [
+        "hero",
+        "featured-listings",
+        "agent-bio",
+        "testimonials",
+        "contact"
+      ],
+      "checks": [
+        {
+          "name": "required-blocks",
+          "passed": true
+        },
+        {
+          "name": "no-empty-content",
+          "passed": true
+        },
+        {
+          "name": "agent-name-in-bio",
+          "passed": true
+        },
+        {
+          "name": "listing-facts-mentioned",
+          "passed": true
+        },
+        {
+          "name": "word-counts",
+          "passed": true
+        },
+        {
+          "name": "schema-shapes",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "file": "05-rural-estate.json",
+      "latencyMs": 9653,
+      "blockTypes": [
+        "hero",
+        "featured-listings",
+        "agent-bio",
+        "testimonials",
+        "contact"
+      ],
+      "checks": [
+        {
+          "name": "required-blocks",
+          "passed": true
+        },
+        {
+          "name": "no-empty-content",
+          "passed": true
+        },
+        {
+          "name": "agent-name-in-bio",
+          "passed": true
+        },
+        {
+          "name": "listing-facts-mentioned",
+          "passed": true
+        },
+        {
+          "name": "word-counts",
+          "passed": true
+        },
+        {
+          "name": "schema-shapes",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

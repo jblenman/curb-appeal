@@ -1,0 +1,36 @@
+{
+  "agent": {
+    "name": "Maya Chen",
+    "brokerage": "Pacific Shore Real Estate",
+    "yearsExperience": 12,
+    "city": "Santa Monica",
+    "email": "maya@example.com",
+    "phone": "(310) 555-0142",
+    "bio": "Specializing in coastal California luxury condos and beach properties since 2014."
+  },
+  "listings": [
+    {
+      "price": "$1,850,000",
+      "address": "1234 Ocean View Dr #501, Santa Monica, CA 90402",
+      "beds": 2,
+      "baths": 2,
+      "sqft": 1450,
+      "description": "Top-floor corner unit with panoramic ocean views, floor-to-ceiling windows, and a private 220 sqft balcony.",
+      "features": ["Ocean view", "Pool", "Concierge", "Two parking spots"],
+      "neighborhood": "Ocean Park",
+      "imageUrl": "https://picsum.photos/seed/condo1/1200/800"
+    },
+    {
+      "price": "$2,400,000",
+      "address": "789 Palisade Ave #310, Santa Monica, CA 90402",
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 1980,
+      "description": "Renovated three-bedroom in a 2019 boutique building.",
+      "features": ["Roof deck", "Gym", "Pet friendly", "EV charging"],
+      "neighborhood": "Wilshire-Montana",
+      "imageUrl": "https://picsum.photos/seed/condo2/1200/800"
+    }
+  ],
+  "preferences": { "tone": "luxe" }
+}

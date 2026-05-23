@@ -1,0 +1,25 @@
+{
+  "agent": {
+    "name": "Jack Bergstrom",
+    "brokerage": "Mountain & Meadow Properties",
+    "yearsExperience": 18,
+    "city": "Bozeman",
+    "email": "jack@example.com",
+    "phone": "(406) 555-0455",
+    "bio": "Specializing in ranch, equestrian, and large-acreage properties throughout southwest Montana. Lifelong horseman."
+  },
+  "listings": [
+    {
+      "price": "$4,750,000",
+      "address": "1855 Sourdough Canyon Rd, Bozeman, MT 59715",
+      "beds": 4,
+      "baths": 3.5,
+      "sqft": 5200,
+      "description": "85-acre equestrian estate with custom timber-frame home, six-stall barn, indoor riding arena, and creek frontage. Adjoins national forest.",
+      "features": ["85 acres", "Six-stall barn", "Indoor riding arena", "Creek frontage", "Adjoins national forest", "Custom timber frame"],
+      "neighborhood": "Sourdough Canyon",
+      "imageUrl": "https://picsum.photos/seed/rural1/1200/800"
+    }
+  ],
+  "preferences": { "tone": "professional" }
+}

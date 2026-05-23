@@ -1,0 +1,47 @@
+{
+  "agent": {
+    "name": "Eleanor Whitfield",
+    "brokerage": "Whitfield & Associates",
+    "yearsExperience": 22,
+    "city": "Charleston",
+    "email": "eleanor@example.com",
+    "phone": "(843) 555-0317",
+    "bio": "Top producer in Historic Charleston for twelve consecutive years. Founder of Whitfield & Associates."
+  },
+  "listings": [
+    {
+      "price": "$3,200,000",
+      "address": "47 Tradd St, Charleston, SC 29401",
+      "beds": 5,
+      "baths": 4.5,
+      "sqft": 4100,
+      "description": "Restored single house circa 1820 with original heart-pine floors and three working fireplaces.",
+      "features": ["Historic single house", "Three fireplaces", "Walled garden", "Original heart-pine floors"],
+      "neighborhood": "South of Broad",
+      "imageUrl": "https://picsum.photos/seed/multi1/1200/800"
+    },
+    {
+      "price": "$1,675,000",
+      "address": "12 Anson St, Charleston, SC 29401",
+      "beds": 3,
+      "baths": 3,
+      "sqft": 2200,
+      "description": "Renovated Charleston single in Ansonborough. Off-street parking and private courtyard.",
+      "features": ["Off-street parking", "Private courtyard", "Renovated kitchen"],
+      "neighborhood": "Ansonborough",
+      "imageUrl": "https://picsum.photos/seed/multi2/1200/800"
+    },
+    {
+      "price": "$985,000",
+      "address": "238 Coming St #2, Charleston, SC 29403",
+      "beds": 2,
+      "baths": 2,
+      "sqft": 1150,
+      "description": "Top floor of a converted historic warehouse. Exposed brick, vaulted ceilings, walking distance to King Street.",
+      "features": ["Exposed brick", "Vaulted ceilings", "Top floor", "Walk to King St"],
+      "neighborhood": "Cannonborough-Elliotborough",
+      "imageUrl": "https://picsum.photos/seed/multi3/1200/800"
+    }
+  ],
+  "preferences": { "tone": "luxe" }
+}

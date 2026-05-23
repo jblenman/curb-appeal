@@ -26,10 +26,29 @@ The UI runs at `http://localhost:5173`. The Express API runs at `http://localhos
 
 - **Frontend:** Vite + React 18 + TypeScript
 - **Backend:** Express (Node 20+) — proxies Claude API so the key stays server-side
-- **AI:** Claude Sonnet 4.6 via the Anthropic SDK
-- **Generation pattern:** two-pass — block selection, then per-block copy
+- **AI:** Claude Sonnet 4.6 via the Anthropic SDK with system-prompt caching
+- **Generation pattern:** two-pass — block selection, then per-block copy (parallel)
 - **Storage:** filesystem JSON (no database)
 - **Logs:** `logs/generations/<timestamp>-<id>.jsonl` — every prompt and response captured for review
+
+## Evals
+
+Five test cases in `evals/cases/` — varied agents, listing counts, geographies, and tones — exercised against six deterministic rubric checks per case (`evals/rubric.ts`):
+
+1. **required-blocks** — `hero`, `agent-bio`, `contact` always present; `featured-listings` required when input has listings
+2. **no-empty-content** — every block's primary fields are non-empty
+3. **agent-name-in-bio** — the agent's name appears in the bio block
+4. **listing-facts-mentioned** — each input listing's price, street, or neighborhood appears somewhere in the rendered output
+5. **word-counts** — sane bounds per block (hero subheadline 3–60w, agent bio 20–300w, testimonial quotes 5–80w)
+6. **schema-shapes** — collection fields are arrays of objects with the required keys
+
+Run the harness:
+
+```bash
+npm run eval
+```
+
+The baseline run is committed at `evals/results/baseline.json` for inspection. Latest baseline: **30/30 checks passed**, ~9 s per case (Sonnet 4.6, system-prompt caching). Future eval runs are gitignored so the repo doesn't accumulate timestamped JSON; the runner exits non-zero on any failure (CI-ready).
 
 ## What's deliberately *not* here
 

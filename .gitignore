@@ -23,6 +23,11 @@ npm-debug.log*
 data/sites/*.json
 !data/sites/.gitkeep
 
+# Eval results — commit only baseline.json as evidence; gitignore future runs
+evals/results/*
+!evals/results/.gitkeep
+!evals/results/baseline.json
+
 # OS / editor
 .DS_Store
 Thumbs.db

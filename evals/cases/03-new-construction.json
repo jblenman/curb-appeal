@@ -1,0 +1,36 @@
+{
+  "agent": {
+    "name": "Sofia Reyes",
+    "brokerage": "Vanguard New Homes",
+    "yearsExperience": 15,
+    "city": "Austin",
+    "email": "sofia@example.com",
+    "phone": "(512) 555-0234",
+    "bio": "Exclusive listing agent for boutique developers in Central Texas. Specializing in pre-sale new construction since 2010."
+  },
+  "listings": [
+    {
+      "price": "$895,000",
+      "address": "1808 Cedar Hill Dr Unit A, Austin, TX 78704",
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 1920,
+      "description": "Pre-sale modern townhome with rooftop terrace, 2-car garage, and Energy Star certification. Estimated completion Q4 2026.",
+      "features": ["Rooftop terrace", "Energy Star", "Smart home pre-wired", "2-car garage", "Pre-sale pricing"],
+      "neighborhood": "South Lamar",
+      "imageUrl": "https://picsum.photos/seed/build1/1200/800"
+    },
+    {
+      "price": "$1,150,000",
+      "address": "1808 Cedar Hill Dr Unit B, Austin, TX 78704",
+      "beds": 4,
+      "baths": 3.5,
+      "sqft": 2380,
+      "description": "End unit with private yard. Pre-sale pricing locked through August 2026.",
+      "features": ["End unit", "Private yard", "Rooftop terrace", "Energy Star", "Smart home pre-wired"],
+      "neighborhood": "South Lamar",
+      "imageUrl": "https://picsum.photos/seed/build2/1200/800"
+    }
+  ],
+  "preferences": { "tone": "professional" }
+}
