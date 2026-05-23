@@ -1,8 +1,9 @@
+// IMPORTANT: dotenv must load before any module that reads process.env at import time
+// (notably ./generate.js, which instantiates the Anthropic client at module-load).
+// `dotenv/config` is the side-effect import that runs config() immediately.
+import "dotenv/config";
 import express from "express";
-import { config as dotenvConfig } from "dotenv";
 import { generateSite } from "./generate.js";
-
-dotenvConfig();
 
 const app = express();
 const port = Number(process.env.API_PORT) || 8787;

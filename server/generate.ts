@@ -1,3 +1,6 @@
+// Belt-and-suspenders: also load dotenv here in case generate.ts is imported
+// from a different entry point (e.g. evals/run.ts) that doesn't pre-load it.
+import "dotenv/config";
 import Anthropic from "@anthropic-ai/sdk";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
