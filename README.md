@@ -6,6 +6,8 @@ An AI-driven real estate site generator. Feed it a listing and an agent profile;
 
 The interesting parts are the architecture, not the styling. See [`docs/ARM.md`](docs/ARM.md) for the design doc (formatted as an "ARM" document — Architecture, Reasoning, Migration — to mirror Luxury Presence's internal planning format).
 
+![Generated site preview — Santa Monica luxury condo hero with AI-written copy citing input facts (agent name, neighborhoods, brokerage), followed by the start of the featured listings block](docs/screenshot.png)
+
 ## How this was built
 
 This codebase was built with Claude Code as the pair. Claude drove the keyboard; I navigated — scoped the project, made architectural calls (Vite + React + TS + Express, two-pass generation, block-based composition mirroring LP's data model), reviewed every change, redirected when I wanted something different. I wrote essentially none of the code by hand. I'm including this note because pretending otherwise would misrepresent the workflow, and the workflow *is* the point: this is what's possible in a weekend in an unfamiliar stack when Claude Code is your collaborator.
