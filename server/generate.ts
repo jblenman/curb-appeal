@@ -43,9 +43,15 @@ interface GenerationLog {
 }
 
 async function logGeneration(inputId: string, entry: GenerationLog): Promise<void> {
-  await mkdir(LOGS_DIR, { recursive: true });
-  const path = join(LOGS_DIR, `${Date.now()}-${inputId}.jsonl`);
-  await writeFile(path, JSON.stringify(entry) + "\n", { flag: "a" });
+  // Best-effort: serverless filesystems (Vercel, Lambda, etc.) are read-only
+  // outside /tmp. Don't let a missing log directory crash a real generation.
+  try {
+    await mkdir(LOGS_DIR, { recursive: true });
+    const path = join(LOGS_DIR, `${Date.now()}-${inputId}.jsonl`);
+    await writeFile(path, JSON.stringify(entry) + "\n", { flag: "a" });
+  } catch (err) {
+    console.warn(`[logGeneration] skipped (${(err as Error).message})`);
+  }
 }
 
 function extractText(resp: Anthropic.Message): string {
