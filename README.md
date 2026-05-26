@@ -2,6 +2,8 @@
 
 > *A personal weekend project exploring what Luxury Presence's AI Website Builder team builds. Not affiliated with or endorsed by Luxury Presence — just a senior engineer's homework before an interview.*
 
+**[Live demo →](https://curb-appeal-drab.vercel.app/)** · click *Generate site* to compose a one-page real-estate site from the sample listing (takes ~10 seconds — two-pass Claude API call).
+
 An AI-driven real estate site generator. Feed it a listing and an agent profile; it composes a one-page site from a block library with AI-written copy.
 
 The interesting parts are the architecture, not the styling. See [`docs/ARM.md`](docs/ARM.md) for the design doc (formatted as an "ARM" document — Architecture, Reasoning, Migration — to mirror Luxury Presence's internal planning format).
