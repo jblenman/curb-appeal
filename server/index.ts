@@ -6,6 +6,10 @@ import express from "express";
 import { generateSite } from "./generate.js";
 
 const app = express();
+// Don't advertise the server framework (defensive hygiene — Phase 1).
+// In production the Vercel handler (api/generate.ts) is non-Express and
+// doesn't emit this header; security headers there come from vercel.json.
+app.disable("x-powered-by");
 const port = Number(process.env.API_PORT) || 8787;
 
 app.use(express.json({ limit: "1mb" }));
