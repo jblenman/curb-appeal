@@ -21,7 +21,7 @@ If you are reading this for the first time, jump to [Phase status](#phase-status
 | # | Phase | Status | Shipped | PR / Commit |
 |---|---|---|---|---|
 | 1 | Security & hardening | ✅ Shipped | 2026-05-29 · securityheaders.com **A+** | [#1](https://github.com/jblenman/curb-appeal/pull/1) · 90931dc |
-| 2 | AI engineering & demo telemetry | Planned | — | — |
+| 2 | AI engineering & demo telemetry | ✅ Shipped | 2026-05-29 · prod-verified (streaming + routing + refinement live) | [#2](https://github.com/jblenman/curb-appeal/pull/2) · 5744754 |
 | 3 | Accessibility (WCAG 2.1 AA) | Planned | — | — |
 | 4 | Discoverability & SEO | Planned | — | — |
 | 5 | Performance | Planned | — | — |
