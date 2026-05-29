@@ -1,11 +1,11 @@
 // Vercel serverless function — POST /api/generate
-// Reuses the same `generateSite()` core that the local Express server uses.
-// In production (Vercel), the Express server in server/index.ts is unused;
-// in local dev, Vite proxies /api/generate to the Express server and this
-// file is never invoked.
+// Thin wrapper over the shared handler (server/handler.ts); the same code runs
+// behind the local Express dev server. Supports JSON and NDJSON streaming
+// (when the request body includes { stream: true }).
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { generateSite } from "../server/generate.js";
+import { handleGenerate } from "../server/handler.js";
+import { clientIp } from "../server/guard.js";
 
 export default async function handler(
   req: VercelRequest,
@@ -15,20 +15,14 @@ export default async function handler(
     res.status(405).json({ error: "Method not allowed. Use POST." });
     return;
   }
-
-  try {
-    const result = await generateSite(req.body);
-    res.status(200).json(result);
-  } catch (err) {
-    console.error("[api/generate] error:", err);
-    res
-      .status(500)
-      .json({ error: err instanceof Error ? err.message : String(err) });
-  }
+  await handleGenerate(
+    { body: req.body, ip: clientIp(req.headers, req.socket?.remoteAddress) },
+    res,
+  );
 }
 
-// Vercel function config — give the model time to do both passes.
-// Default is 10s on the Hobby plan; this generation typically takes 8-12s.
+// Streaming holds the connection open for the full generation (~30s); give it
+// headroom beyond the Hobby default.
 export const config = {
-  maxDuration: 30,
+  maxDuration: 60,
 };

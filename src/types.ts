@@ -103,4 +103,71 @@ export interface SiteConfig {
   agent: AgentProfile;
   blocks: SiteBlock[];
   generatedAt: string;
+  /** Free-text persona that seeded this site (persona flow only). */
+  persona?: string;
+  /** Per-step model/token/latency/cost telemetry. Optional — the eval harness ignores it. */
+  telemetry?: GenerationTelemetry;
+  /** True when served from the in-memory persona cache (no new API spend). */
+  cached?: boolean;
 }
+
+// --- Telemetry (surfaced to the demo overlay) --------------------------------
+
+export interface TelemetryStep {
+  /** Stable id, e.g. "persona-expansion", "block-selection", "copy:hero". */
+  step: string;
+  /** Human-friendly label for the overlay. */
+  label: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheCreationTokens: number;
+  latencyMs: number;
+  costUsd: number;
+}
+
+export interface GenerationTelemetry {
+  steps: TelemetryStep[];
+  totals: {
+    calls: number;
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadTokens: number;
+    cacheCreationTokens: number;
+    /** Wall-clock total (less than the sum of step latencies, since copy runs in parallel). */
+    latencyMs: number;
+    costUsd: number;
+    /** cacheRead / (cacheRead + input). */
+    cacheHitRate: number;
+  };
+  /** Per-section refinement outcomes (present when the refinement loop ran). */
+  refinements?: RefinementRecord[];
+}
+
+export interface RefinementRecord {
+  blockType: BlockType;
+  initialScore: number;
+  finalScore: number;
+  rounds: number;
+}
+
+// --- Streaming protocol (NDJSON) ---------------------------------------------
+// The persona endpoint can stream these events, one JSON object per line, so the
+// UI assembles progressively instead of waiting for the whole site.
+
+export type StreamEvent =
+  | { type: "persona"; agent: AgentProfile }
+  | { type: "blocks"; order: BlockType[] }
+  | { type: "step"; step: TelemetryStep }
+  | { type: "block"; block: SiteBlock }
+  | { type: "block-error"; blockType: BlockType; message: string }
+  | {
+      type: "refine";
+      blockType: BlockType;
+      initialScore: number;
+      finalScore: number;
+      rounds: number;
+    }
+  | { type: "done"; site: SiteConfig }
+  | { type: "error"; message: string };
