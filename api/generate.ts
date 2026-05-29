@@ -6,6 +6,7 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { generateSite, generateSiteFromPersona } from "../server/generate.js";
+import { checkRateLimit, clientIp, getCached, setCached } from "../server/guard.js";
 
 export default async function handler(
   req: VercelRequest,
@@ -18,10 +19,33 @@ export default async function handler(
 
   try {
     const body = (req.body ?? {}) as { persona?: unknown };
-    const result =
+    const persona =
       typeof body.persona === "string" && body.persona.trim()
-        ? await generateSiteFromPersona(body.persona.trim())
-        : await generateSite(req.body);
+        ? body.persona.trim()
+        : null;
+
+    // Cache hits are free and skip the rate limit.
+    if (persona) {
+      const hit = getCached(persona);
+      if (hit) {
+        res.status(200).json({ ...hit, cached: true });
+        return;
+      }
+    }
+
+    const rl = checkRateLimit(clientIp(req.headers, req.socket?.remoteAddress));
+    if (!rl.ok) {
+      res.setHeader("Retry-After", String(rl.retryAfterSec ?? 60));
+      res
+        .status(429)
+        .json({ error: `Rate limit reached — try again in ~${rl.retryAfterSec}s.` });
+      return;
+    }
+
+    const result = persona
+      ? await generateSiteFromPersona(persona)
+      : await generateSite(req.body);
+    if (persona) setCached(persona, result);
     res.status(200).json(result);
   } catch (err) {
     console.error("[api/generate] error:", err);

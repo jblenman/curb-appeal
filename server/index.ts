@@ -4,6 +4,7 @@
 import "dotenv/config";
 import express from "express";
 import { generateSite, generateSiteFromPersona } from "./generate.js";
+import { checkRateLimit, clientIp, getCached, setCached } from "./guard.js";
 
 const app = express();
 // Don't advertise the server framework (defensive hygiene — Phase 1).
@@ -21,10 +22,32 @@ app.get("/api/health", (_req, res) => {
 app.post("/api/generate", async (req, res) => {
   try {
     const body = (req.body ?? {}) as { persona?: unknown };
-    const result =
+    const persona =
       typeof body.persona === "string" && body.persona.trim()
-        ? await generateSiteFromPersona(body.persona.trim())
-        : await generateSite(req.body);
+        ? body.persona.trim()
+        : null;
+
+    if (persona) {
+      const hit = getCached(persona);
+      if (hit) {
+        res.json({ ...hit, cached: true });
+        return;
+      }
+    }
+
+    const rl = checkRateLimit(clientIp(req.headers, req.socket.remoteAddress));
+    if (!rl.ok) {
+      res.setHeader("Retry-After", String(rl.retryAfterSec ?? 60));
+      res
+        .status(429)
+        .json({ error: `Rate limit reached — try again in ~${rl.retryAfterSec}s.` });
+      return;
+    }
+
+    const result = persona
+      ? await generateSiteFromPersona(persona)
+      : await generateSite(req.body);
+    if (persona) setCached(persona, result);
     res.json(result);
   } catch (err) {
     console.error("[generate] error:", err);

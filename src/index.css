@@ -162,6 +162,7 @@ button { font: inherit; cursor: pointer; }
 .telemetry-totals { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; padding: 0.6rem 0.8rem; border-bottom: 1px solid #21262d; }
 .telemetry-totals span { white-space: nowrap; }
 .telemetry-cost { color: #3fb950; font-weight: 600; }
+.telemetry-cached { color: #d29922; font-weight: 600; }
 .telemetry-steps { width: 100%; border-collapse: collapse; }
 .telemetry-steps th, .telemetry-steps td { text-align: left; padding: 0.35rem 0.8rem; border-bottom: 1px solid #161b22; }
 .telemetry-steps th { color: #8b949e; font-weight: 500; }

@@ -107,6 +107,8 @@ export interface SiteConfig {
   persona?: string;
   /** Per-step model/token/latency/cost telemetry. Optional — the eval harness ignores it. */
   telemetry?: GenerationTelemetry;
+  /** True when served from the in-memory persona cache (no new API spend). */
+  cached?: boolean;
 }
 
 // --- Telemetry (surfaced to the demo overlay) --------------------------------

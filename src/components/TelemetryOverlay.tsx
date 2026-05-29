@@ -16,9 +16,11 @@ function fmtUsd(n: number): string {
 export function TelemetryOverlay({
   telemetry,
   persona,
+  cached,
 }: {
   telemetry: GenerationTelemetry;
   persona?: string;
+  cached?: boolean;
 }) {
   const [open, setOpen] = useState(true);
   const t = telemetry.totals;
@@ -54,6 +56,7 @@ export function TelemetryOverlay({
         </span>
         <span>{Math.round(t.cacheHitRate * 100)}% cache</span>
         <span className="telemetry-cost">{fmtUsd(t.costUsd)}</span>
+        {cached && <span className="telemetry-cached">⚡ cached · $0 new</span>}
       </div>
 
       <table className="telemetry-steps">

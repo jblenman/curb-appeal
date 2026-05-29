@@ -8,7 +8,14 @@ async function postGenerate(body: unknown): Promise<SiteConfig> {
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`API ${res.status}: ${text}`);
+    let message = `API ${res.status}: ${text}`;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed?.error) message = parsed.error;
+    } catch {
+      /* not JSON — keep the raw text */
+    }
+    throw new Error(message);
   }
   return res.json();
 }

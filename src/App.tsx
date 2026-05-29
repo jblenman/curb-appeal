@@ -92,7 +92,11 @@ export default function App() {
 
       {config && <SiteRenderer config={config} />}
       {config?.telemetry && (
-        <TelemetryOverlay telemetry={config.telemetry} persona={config.persona} />
+        <TelemetryOverlay
+          telemetry={config.telemetry}
+          persona={config.persona}
+          cached={config.cached}
+        />
       )}
     </>
   );
