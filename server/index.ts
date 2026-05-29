@@ -3,7 +3,7 @@
 // `dotenv/config` is the side-effect import that runs config() immediately.
 import "dotenv/config";
 import express from "express";
-import { generateSite } from "./generate.js";
+import { generateSite, generateSiteFromPersona } from "./generate.js";
 
 const app = express();
 // Don't advertise the server framework (defensive hygiene — Phase 1).
@@ -20,7 +20,11 @@ app.get("/api/health", (_req, res) => {
 
 app.post("/api/generate", async (req, res) => {
   try {
-    const result = await generateSite(req.body);
+    const body = (req.body ?? {}) as { persona?: unknown };
+    const result =
+      typeof body.persona === "string" && body.persona.trim()
+        ? await generateSiteFromPersona(body.persona.trim())
+        : await generateSite(req.body);
     res.json(result);
   } catch (err) {
     console.error("[generate] error:", err);

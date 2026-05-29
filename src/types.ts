@@ -103,4 +103,40 @@ export interface SiteConfig {
   agent: AgentProfile;
   blocks: SiteBlock[];
   generatedAt: string;
+  /** Free-text persona that seeded this site (persona flow only). */
+  persona?: string;
+  /** Per-step model/token/latency/cost telemetry. Optional — the eval harness ignores it. */
+  telemetry?: GenerationTelemetry;
+}
+
+// --- Telemetry (surfaced to the demo overlay) --------------------------------
+
+export interface TelemetryStep {
+  /** Stable id, e.g. "persona-expansion", "block-selection", "copy:hero". */
+  step: string;
+  /** Human-friendly label for the overlay. */
+  label: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  cacheReadTokens: number;
+  cacheCreationTokens: number;
+  latencyMs: number;
+  costUsd: number;
+}
+
+export interface GenerationTelemetry {
+  steps: TelemetryStep[];
+  totals: {
+    calls: number;
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadTokens: number;
+    cacheCreationTokens: number;
+    /** Wall-clock total (less than the sum of step latencies, since copy runs in parallel). */
+    latencyMs: number;
+    costUsd: number;
+    /** cacheRead / (cacheRead + input). */
+    cacheHitRate: number;
+  };
 }

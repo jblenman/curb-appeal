@@ -5,7 +5,7 @@
 // file is never invoked.
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { generateSite } from "../server/generate.js";
+import { generateSite, generateSiteFromPersona } from "../server/generate.js";
 
 export default async function handler(
   req: VercelRequest,
@@ -17,7 +17,11 @@ export default async function handler(
   }
 
   try {
-    const result = await generateSite(req.body);
+    const body = (req.body ?? {}) as { persona?: unknown };
+    const result =
+      typeof body.persona === "string" && body.persona.trim()
+        ? await generateSiteFromPersona(body.persona.trim())
+        : await generateSite(req.body);
     res.status(200).json(result);
   } catch (err) {
     console.error("[api/generate] error:", err);
