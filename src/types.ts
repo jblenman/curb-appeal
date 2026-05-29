@@ -142,3 +142,16 @@ export interface GenerationTelemetry {
     cacheHitRate: number;
   };
 }
+
+// --- Streaming protocol (NDJSON) ---------------------------------------------
+// The persona endpoint can stream these events, one JSON object per line, so the
+// UI assembles progressively instead of waiting for the whole site.
+
+export type StreamEvent =
+  | { type: "persona"; agent: AgentProfile }
+  | { type: "blocks"; order: BlockType[] }
+  | { type: "step"; step: TelemetryStep }
+  | { type: "block"; block: SiteBlock }
+  | { type: "block-error"; blockType: BlockType; message: string }
+  | { type: "done"; site: SiteConfig }
+  | { type: "error"; message: string };
