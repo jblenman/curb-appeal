@@ -10,6 +10,7 @@ import type {
   BlockType,
   GenerationInput,
   GenerationTelemetry,
+  RefinementRecord,
   SiteBlock,
   SiteConfig,
   StreamEvent,
@@ -28,7 +29,19 @@ const MODELS = {
   triage: process.env.MODEL_TRIAGE || "claude-haiku-4-5",
   content:
     process.env.MODEL_CONTENT || process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6",
+  // Judges/critiques sections in the refinement loop. Defaults to the content
+  // model for cost; set MODEL_REASONING=claude-opus-4-8 for premium 3-tier
+  // routing (Haiku triage → Sonnet copy → Opus critique).
+  reasoning:
+    process.env.MODEL_REASONING || process.env.MODEL_CONTENT || "claude-sonnet-4-6",
 };
+
+// Eval-driven refinement: judge each section (1-10) and regenerate ones scoring
+// below the threshold, up to a capped number of rounds. All tunable via env;
+// REFINE_ENABLED=false turns the loop off for the fastest/cheapest path.
+const REFINE_ENABLED = process.env.REFINE_ENABLED !== "false";
+const REFINE_THRESHOLD = Number(process.env.REFINE_THRESHOLD) || 7;
+const REFINE_MAX_ROUNDS = Number(process.env.REFINE_MAX_ROUNDS) || 1;
 
 // --- Pricing (USD per million tokens) ----------------------------------------
 interface Price {
@@ -241,14 +254,18 @@ async function generateBlockContent(
   input: GenerationInput,
   inputId: string,
   steps: TelemetryStep[],
+  critique?: string,
 ): Promise<{ content: unknown; step: TelemetryStep }> {
   const system = `You write copy for AI-generated real estate websites. For each block type, generate JSON content matching the schema. Be specific and grounded — do not invent facts that contradict the inputs (wrong neighborhood, wrong beds, wrong agent name). Tone: ${input.preferences?.tone ?? "professional"}. Respond with ONLY the JSON object.`;
 
-  const user = `Block type: ${blockType}\nSchema: ${SCHEMA_HINTS[blockType]}\n\nAgent: ${JSON.stringify(input.agent, null, 2)}\nListings: ${JSON.stringify(input.listings, null, 2)}\n\nWrite the JSON content for this block.`;
+  const critiqueNote = critique
+    ? `\n\nA previous attempt scored below the quality bar. Address this critique specifically and improve the copy:\n${critique}`
+    : "";
+  const user = `Block type: ${blockType}\nSchema: ${SCHEMA_HINTS[blockType]}\n\nAgent: ${JSON.stringify(input.agent, null, 2)}\nListings: ${JSON.stringify(input.listings, null, 2)}${critiqueNote}\n\nWrite the JSON content for this block.`;
 
   const { text, step } = await callModel({
-    step: `copy:${blockType}`,
-    label: `Copy — ${blockType}`,
+    step: critique ? `refine:${blockType}` : `copy:${blockType}`,
+    label: critique ? `Refine — ${blockType}` : `Copy — ${blockType}`,
     model: MODELS.content,
     system,
     user,
@@ -262,6 +279,92 @@ async function generateBlockContent(
     throw new Error(`${blockType} content returned no JSON object: ${text}`);
   }
   return { content: JSON.parse(match[0]), step };
+}
+
+// LLM judge for one section — scores 1-10 and names the single most important
+// fix. Fail-open: a parse failure is treated as "passing" so a flaky judge can
+// never block generation.
+async function judgeBlock(
+  blockType: BlockType,
+  content: unknown,
+  input: GenerationInput,
+  inputId: string,
+  steps: TelemetryStep[],
+): Promise<{ score: number; critique: string }> {
+  const system = `You are a strict editor scoring ONE section of an AI-generated real estate website. Score 1-10 on: groundedness (no facts that contradict the agent or listings), specificity (concrete and locally-flavored, not generic boilerplate), tone fit, and completeness. Respond with ONLY JSON: {"score": <number 1-10>, "critique": "<one or two sentences naming the single most important fix>"}.`;
+  const user = `Block type: ${blockType}\nAgent: ${JSON.stringify(input.agent)}\nListings: ${JSON.stringify(input.listings)}\nSection content: ${JSON.stringify(content)}\n\nScore this section.`;
+
+  const { text } = await callModel({
+    step: `judge:${blockType}`,
+    label: `Judge — ${blockType}`,
+    model: MODELS.reasoning,
+    system,
+    user,
+    maxTokens: 300,
+    inputId,
+    steps,
+  });
+
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return { score: REFINE_THRESHOLD, critique: "" };
+  try {
+    const parsed = JSON.parse(match[0]) as { score?: number; critique?: string };
+    const score =
+      typeof parsed.score === "number"
+        ? Math.max(1, Math.min(10, parsed.score))
+        : REFINE_THRESHOLD;
+    return { score, critique: parsed.critique ?? "" };
+  } catch {
+    return { score: REFINE_THRESHOLD, critique: "" };
+  }
+}
+
+interface RefineResult {
+  blockType: BlockType;
+  content: unknown;
+  steps: TelemetryStep[];
+  refinement: { initialScore: number; finalScore: number; rounds: number } | null;
+  error: string | null;
+}
+
+// One section's full loop: generate → judge → regenerate-if-weak (capped). Uses
+// its own steps array so parallel sections don't interleave telemetry.
+async function refineBlock(
+  blockType: BlockType,
+  input: GenerationInput,
+  inputId: string,
+): Promise<RefineResult> {
+  const steps: TelemetryStep[] = [];
+  try {
+    let { content } = await generateBlockContent(blockType, input, inputId, steps);
+    if (!REFINE_ENABLED) {
+      return { blockType, content, steps, refinement: null, error: null };
+    }
+    let judged = await judgeBlock(blockType, content, input, inputId, steps);
+    const initialScore = judged.score;
+    let rounds = 0;
+    while (judged.score < REFINE_THRESHOLD && rounds < REFINE_MAX_ROUNDS) {
+      rounds++;
+      const regen = await generateBlockContent(blockType, input, inputId, steps, judged.critique);
+      content = regen.content;
+      judged = await judgeBlock(blockType, content, input, inputId, steps);
+    }
+    return {
+      blockType,
+      content,
+      steps,
+      refinement: { initialScore, finalScore: judged.score, rounds },
+      error: null,
+    };
+  } catch (e) {
+    return {
+      blockType,
+      content: null,
+      steps,
+      refinement: null,
+      error: e instanceof Error ? e.message : String(e),
+    };
+  }
 }
 
 function summarize(steps: TelemetryStep[], wallMs: number): GenerationTelemetry {
@@ -363,26 +466,24 @@ export async function* generateSiteStream(
   yield { type: "step", step: steps[steps.length - 1] };
   yield { type: "blocks", order: blockTypes };
 
-  // Parallel copy generation, emitted as each completes (never rejects — errors
-  // are captured so one bad block can't abort the whole stream).
-  const jobs = blockTypes.map((blockType) =>
-    generateBlockContent(blockType, input, inputId, steps)
-      .then((r) => ({ blockType, content: r.content, step: r.step, error: null as string | null }))
-      .catch((e) => ({
-        blockType,
-        content: null as unknown,
-        step: null as TelemetryStep | null,
-        error: e instanceof Error ? e.message : String(e),
-      })),
-  );
+  // Each section runs its own generate → judge → regenerate-if-weak loop in
+  // parallel; emitted as each section's loop completes. refineBlock never
+  // rejects (errors are captured) so one bad section can't abort the stream.
+  const jobs = blockTypes.map((blockType) => refineBlock(blockType, input, inputId));
 
   const blocks: SiteBlock[] = [];
+  const refinements: RefinementRecord[] = [];
   for await (const r of asCompleted(jobs)) {
+    for (const s of r.steps) steps.push(s); // fold into the run total
     if (r.error || r.content == null) {
       yield { type: "block-error", blockType: r.blockType, message: r.error ?? "unknown error" };
       continue;
     }
-    if (r.step) yield { type: "step", step: r.step };
+    for (const s of r.steps) yield { type: "step", step: s };
+    if (r.refinement) {
+      refinements.push({ blockType: r.blockType, ...r.refinement });
+      yield { type: "refine", blockType: r.blockType, ...r.refinement };
+    }
     const block = { id: randomUUID(), type: r.blockType, content: r.content } as SiteBlock;
     blocks.push(block);
     yield { type: "block", block };
@@ -393,13 +494,16 @@ export async function* generateSiteStream(
     .map((type) => blocks.find((b) => b.type === type))
     .filter((b): b is SiteBlock => Boolean(b));
 
+  const telemetry = summarize(steps, Date.now() - t0);
+  if (refinements.length) telemetry.refinements = refinements;
+
   const site: SiteConfig = {
     themeSlug: "modern-coastal",
     agent: input.agent,
     blocks: ordered,
     generatedAt: new Date().toISOString(),
     persona,
-    telemetry: summarize(steps, Date.now() - t0),
+    telemetry,
   };
   yield { type: "done", site };
 }

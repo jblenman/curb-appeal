@@ -163,6 +163,10 @@ button { font: inherit; cursor: pointer; }
 .telemetry-totals span { white-space: nowrap; }
 .telemetry-cost { color: #3fb950; font-weight: 600; }
 .telemetry-cached { color: #d29922; font-weight: 600; }
+.telemetry-refine { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; padding: 0.5rem 0.8rem; border-bottom: 1px solid #21262d; }
+.telemetry-refine-label { color: #8b949e; }
+.telemetry-refine .rf { padding: 0.1rem 0.45rem; border: 1px solid #30363d; border-radius: 4px; }
+.telemetry-refine .rf.improved { color: #d29922; border-color: #d29922; }
 
 /* Streaming progress strip — shows sections filling in as they arrive */
 .stream-status { max-width: var(--max-width); margin: 1.5rem auto 0; padding: 0 2rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }

@@ -9,6 +9,10 @@ function fmtUsd(n: number): string {
   return "$" + n.toFixed(n < 0.01 ? 4 : 3);
 }
 
+function shortBlock(t: string): string {
+  return t.replace("featured-listings", "listings").replace("agent-bio", "bio");
+}
+
 /**
  * Always-on (dismissable) overlay that makes the AI work visible: per-step
  * model routing, tokens, latency, and estimated cost, plus run totals.
@@ -58,6 +62,21 @@ export function TelemetryOverlay({
         <span className="telemetry-cost">{fmtUsd(t.costUsd)}</span>
         {cached && <span className="telemetry-cached">⚡ cached · $0 new</span>}
       </div>
+
+      {telemetry.refinements && telemetry.refinements.length > 0 && (
+        <div className="telemetry-refine">
+          <span className="telemetry-refine-label">eval refine</span>
+          {telemetry.refinements.map((r) => (
+            <span
+              key={r.blockType}
+              className={r.rounds > 0 ? "rf improved" : "rf"}
+              title={r.rounds > 0 ? `regenerated ${r.rounds}×` : "passed first try"}
+            >
+              {shortBlock(r.blockType)} {r.rounds > 0 ? `${r.initialScore}→${r.finalScore}` : r.finalScore}
+            </span>
+          ))}
+        </div>
+      )}
 
       <table className="telemetry-steps">
         <thead>

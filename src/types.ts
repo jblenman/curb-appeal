@@ -141,6 +141,15 @@ export interface GenerationTelemetry {
     /** cacheRead / (cacheRead + input). */
     cacheHitRate: number;
   };
+  /** Per-section refinement outcomes (present when the refinement loop ran). */
+  refinements?: RefinementRecord[];
+}
+
+export interface RefinementRecord {
+  blockType: BlockType;
+  initialScore: number;
+  finalScore: number;
+  rounds: number;
 }
 
 // --- Streaming protocol (NDJSON) ---------------------------------------------
@@ -153,5 +162,12 @@ export type StreamEvent =
   | { type: "step"; step: TelemetryStep }
   | { type: "block"; block: SiteBlock }
   | { type: "block-error"; blockType: BlockType; message: string }
+  | {
+      type: "refine";
+      blockType: BlockType;
+      initialScore: number;
+      finalScore: number;
+      rounds: number;
+    }
   | { type: "done"; site: SiteConfig }
   | { type: "error"; message: string };

@@ -5,6 +5,7 @@ import { streamFromPersona } from "./lib/api";
 import type {
   BlockType,
   GenerationTelemetry,
+  RefinementRecord,
   SiteBlock,
   SiteConfig,
   TelemetryStep,
@@ -18,7 +19,11 @@ const EXAMPLES = [
 
 type Phase = "idle" | "expanding" | "building" | "done";
 
-function runningTelemetry(steps: TelemetryStep[], wallMs: number): GenerationTelemetry {
+function runningTelemetry(
+  steps: TelemetryStep[],
+  wallMs: number,
+  refinements: RefinementRecord[],
+): GenerationTelemetry {
   const totals = steps.reduce(
     (a, s) => {
       a.inputTokens += s.inputTokens;
@@ -41,7 +46,11 @@ function runningTelemetry(steps: TelemetryStep[], wallMs: number): GenerationTel
   );
   const cacheable = totals.inputTokens + totals.cacheReadTokens;
   totals.cacheHitRate = cacheable > 0 ? totals.cacheReadTokens / cacheable : 0;
-  return { steps: [...steps], totals };
+  return {
+    steps: [...steps],
+    totals,
+    refinements: refinements.length ? [...refinements] : undefined,
+  };
 }
 
 export default function App() {
@@ -61,6 +70,7 @@ export default function App() {
 
     const start = Date.now();
     const steps: TelemetryStep[] = [];
+    const refinements: RefinementRecord[] = [];
     let agent: SiteConfig["agent"] | undefined;
     let blockOrder: BlockType[] = [];
     const byType = new Map<BlockType, SiteBlock>();
@@ -76,7 +86,7 @@ export default function App() {
         blocks,
         generatedAt: "",
         persona: text,
-        telemetry: runningTelemetry(steps, Date.now() - start),
+        telemetry: runningTelemetry(steps, Date.now() - start, refinements),
       });
     };
 
@@ -104,6 +114,15 @@ export default function App() {
           case "block-error":
             // Non-fatal: leave the section out and keep assembling.
             console.warn(`block ${e.blockType} failed: ${e.message}`);
+            break;
+          case "refine":
+            refinements.push({
+              blockType: e.blockType,
+              initialScore: e.initialScore,
+              finalScore: e.finalScore,
+              rounds: e.rounds,
+            });
+            apply();
             break;
           case "done":
             setConfig(e.site);
