@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SiteRenderer } from "./components/SiteRenderer";
 import { TelemetryOverlay } from "./components/TelemetryOverlay";
 import { streamFromPersona } from "./lib/api";
+import { compareSites, type UniquenessResult } from "./lib/uniqueness";
 import type {
   BlockType,
   GenerationTelemetry,
@@ -59,11 +60,17 @@ export default function App() {
   const [order, setOrder] = useState<BlockType[]>([]);
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [uniqueness, setUniqueness] = useState<UniquenessResult | null>(null);
+  const [prevPersona, setPrevPersona] = useState("");
 
   async function generate(p: string) {
     const text = p.trim();
     if (!text) return;
+    // Compare the upcoming site against the last completed one (free, client-side).
+    const prior =
+      phase === "done" && config && config.persona && config.persona !== text ? config : null;
     setError(null);
+    setUniqueness(null);
     setConfig(null);
     setOrder([]);
     setPhase("expanding");
@@ -128,6 +135,10 @@ export default function App() {
             setConfig(e.site);
             setOrder(e.site.blocks.map((b) => b.type));
             setPhase("done");
+            if (prior) {
+              setUniqueness(compareSites(prior, e.site));
+              setPrevPersona(prior.persona ?? "previous site");
+            }
             break;
           case "error":
             setError(e.message);
@@ -210,6 +221,21 @@ export default function App() {
               {arrived.has(t) ? "✓" : "⋯"} {t}
             </span>
           ))}
+        </div>
+      )}
+
+      {phase === "done" && uniqueness && (
+        <div
+          className={
+            "uniqueness " +
+            (uniqueness.overlap < 0.25 ? "good" : uniqueness.overlap < 0.5 ? "mid" : "bad")
+          }
+        >
+          <strong>Uniqueness</strong> vs “{prevPersona}”:{" "}
+          {Math.round(uniqueness.overlap * 100)}% lexical overlap ·{" "}
+          {uniqueness.sharedCliches.length === 0
+            ? "no shared clichés — distinct ✓"
+            : `shared clichés: ${uniqueness.sharedCliches.join(", ")}`}
         </div>
       )}
 
